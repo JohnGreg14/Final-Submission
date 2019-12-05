@@ -31,7 +31,7 @@
             var directionallight = new THREE.DirectionalLight( 0xffffff, 3 );
             scene.add( directionallight );
 
-            var material = new THREE.MeshBasicMaterial({color:0xE0E0E0});
+            var material = new THREE.MeshNormalMaterial();
 
             var loader = new THREE.OBJLoader();
             loader.load( 'Models/Satellite.obj', function( object ){

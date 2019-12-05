@@ -6,13 +6,15 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 	</head>
 	<body>
-        <script src="js/three.js"></script>
+		<script src="js/three.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/dat.gui.js"></script>
 
             <script>
             var camera, scene, renderer, stats;
 
 			var mesh;
-            var amount = 10;
+            var amount = 30;
 			var count = Math.pow( amount, 3 );
 			var dummy = new THREE.Object3D();
 
@@ -22,21 +24,24 @@
 			function init() {
 
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-                camera.position.x= 0;
-                camera.position.y= 6;
-                camera.position.z= 15;
-				//camera.position.set( amount * 0.9, amount * 0.9, amount * 0.9 );
+                // camera.position.x= 0;
+                // camera.position.y= 6;
+                // camera.position.z= 15;
+				camera.position.set( amount * 0.9, amount * 0.9, amount * 0.9 );
 				camera.lookAt( 0, 0, 0 );
 
                 scene = new THREE.Scene();
 
 				
                 var geometry = new THREE.BoxGeometry( 1, 1, 1 )
-				var material = new THREE.MeshBasicMaterial( { color: 0xE0E0E0, opacity: 0.1, transparent: true } );
+				var material = new THREE.MeshNormalMaterial();
 
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
 				scene.add( mesh );
+
+				var gui = new dat.GUI();
+				gui.add( mesh, 'count', 0, count );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -45,7 +50,7 @@
 
 				//
 
-				
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 				//
 
@@ -65,6 +70,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update()
 
 				render();
 
