@@ -9,6 +9,10 @@
 		<script src="js/three.js"></script>
 		<script src="js/OrbitControls.js"></script>
 		<script src="js/dat.gui.js"></script>
+		<script src="js/OBJLoader.js"></script>
+		<!-- <script src="js/ObjectLoader.js"></script> -->
+		<!-- <script src="js/LegacyJSONLoader.js"></script> -->
+		<!-- <script src="js/BufferGeometryLoader.js"></script> -->
 
             <script>
             var camera, scene, renderer, stats;
@@ -33,15 +37,23 @@
                 scene = new THREE.Scene();
 
 				
-                var geometry = new THREE.BoxGeometry( 1, 1, 1 )
 				var material = new THREE.MeshNormalMaterial();
+				var geometry = new THREE.InstancedBufferGeometry();
 
+				var loader = new THREE.OBJLoader();
+				loader.load( 'Models/Satellite.obj', function( object ){
+				object.traverse( function( child ) {
+					if ( child instanceof THREE.Mesh ) {
+						child.material = material;
+						child.geometry = geometry;
+					}
+				} );
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
-				scene.add( mesh );
 
-				var gui = new dat.GUI();
-				gui.add( mesh, 'count', 0, count );
+				scene.add( mesh );
+				});
+
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );

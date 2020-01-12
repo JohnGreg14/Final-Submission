@@ -32,12 +32,14 @@
             scene.add( directionallight );
 
             var material = new THREE.MeshNormalMaterial();
+            var geometry = new THREE.BufferGeometry();
 
             var loader = new THREE.OBJLoader();
             loader.load( 'Models/Satellite.obj', function( object ){
             object.traverse( function( child ) {
                 if ( child instanceof THREE.Mesh ) {
                     child.material = material;
+                    // child.geometry = geometry;
                 }
             } );
             scene.add( object );
