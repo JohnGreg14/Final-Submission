@@ -27,8 +27,8 @@
             function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( amount * 0.9, amount * 0.9, amount * 0.9 );
-				// camera.lookAt( dummy.positon.x, dummy.postion.y, dummy.position.z );
+				camera.position.set( amount * 4, amount * 4, amount * 4 );
+			
 
                 scene = new THREE.Scene();
                 
@@ -83,41 +83,6 @@
 
             }
 
-            // function render() { 
-
-            //     if  ( mesh ) {
-
-            //     for (var i=0; i < count; i++ ) {
-
-            //         dummy.position.set(
-
-            //             Math.random()*20 - 10,
-            //             Math.random()*20 - 10,
-            //             Math.random()*20 - 10
-
-            //         );
-
-            //         dummy.rotation.set(
-
-            //             Math.random() * Math.PI,
-            //             Math.random() * Math.PI,
-            //             Math.random() * Math.PI
-            //         )
-
-            //         dummy.updateMatrix();
-
-            //         mesh.setMatrixAt( i, dummy.Matrix );
-            //     }
-
-            //     mesh.instanceMatrix.needsUpdate = true;
-
-            //     }
-            
-
-            // renderer.render( scene, camera );
-
-            // }
-
             function render() {
 
                 if ( mesh ) {
@@ -171,8 +136,7 @@
 
                                 mesh.setMatrixAt( i ++, dummy.matrix );
 
-                                // console.log(Math.random());
-                                // console.log(dummy.position.x);
+                            
 
                             }
 
