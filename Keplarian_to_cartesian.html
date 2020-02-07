@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang=en>
+<body>
+    <script src="js/three.js">
+
+    converttocartesian();
+    animate();
+
+    function converttocartesian() {
+        var eraw, //L2 C27-33
+            n, //L2 C53-63
+            ideg, //L2 C09-16
+            wdeg, //L2 C35-42
+            t, 
+            t0, 
+            M0, 
+            omegadeg; //L2 C18-25
+
+        // TESTING DATA WITH GEOSTATIONARY SAT
+            eraw = 40385;
+            n = 1.00277387;
+            ideg = 14.2407;
+            wdeg = 318.6668;
+            t = 0;
+            t0 = 0;
+            omegadeg = 225.5871;
+
+
+        var mu = 3.98604419e14;
+        var e = eraw*1e-07;
+        var a = (Math.pow(mu, 1/3)) / (Math.pow((2*n*Math.PI / 86400), 2/3));
+        var Mt; //Mean anomaly at time t
+        var i = ideg*(Math.PI/180);
+        var w = wdeg*(Math.PI/180);
+        var omega = omegadeg*(Math.PI/180);
+        if (t==t0) {
+            t=t0;
+            Mt=0;
+
+        } else {
+            var deltaT = 86400(t-t0);
+            Mt = deltaT*Math.Sqrt(mu/Math.pow(a, 3));
+            Mt= Mt % 2*Math.PI;
+        }
+
+        // Newton Raphson method for finding eccentric anomaly
+        var E = Mt;
+        var F = E - e * Math.Sin(E) - Mt;
+        var j = 0, maxSteps = 100;
+        var stepSize = 1e-3;
+        while (Math.Abs(F) > stepSize && j<maxSteps) {
+            E = E - F / (1 - e * Math.Cos(E)) % 2*Math.PI;
+            F = E - e * Math.Sin(E) - Mt;
+            j++;
+        }
+
+        // Calculate True anomaly
+        var Vt = 2 * Math.Atan2( Math.sqrt( 1 + e ) * Math.Sin( E / 2 ) , Math.Sqrt(1 - e ) * Math.Cos( E / 2));
+
+        // Calculate distance to central body
+        var rc = a * (1 - e * Math.Cos(E));
+
+        var vcoeff = Math.sqrt(mu / a ) / rt;
+
+        Ot = new THREE.Vector3(rc * Math.Cos(Vt), rc * Math.Sin(Vt), 0);
+        Odott = new THREE.Vector3(vcoeff * -Math.Sin(E), vcoeff * Math.sqrt(1 - Math.pow(e, 2)) * Math.Cos(E), 0);
+
+        var rx, ry, rz;
+        // rx = Ot.x; ry = Ot.y; rz = Ot.z;
+
+        rx = (Ot.x * (Math.Cos(w) * Math.Cos(omega) - Math.Sin(w) * Math.Cos(i) * Math.Sin(omega)) - Ot.y * (Math.Sin(w) * Math.Cos(omega) + Math.Cos(w) * Math.Cos(i) * Math.Sin(omega)));
+        ry = (Ot.x * (Math.Cos(w) * Math.Sin(omega) + Math.Sin(w) * Math.Cos(i) * Math.Cos(omega)) + Ot.y * (Math.Cos(w) * Math.Cos(i) * Math.Cos(omega) - Math.Sin(w) * Math.Sin(omega)));
+        rz = (Ot.x * (Math.Sin(w) * Math.Sin(i)) + Ot.y * (Math.Cos(w) * Math.Sin(i)));
+        
+        var Positions = new THREE.Vector3(rx, ry, rz);
+        // Positions.toArray(); //Is this necessary??
+
+        var rdotx, rdoty, rdotz;
+
+
+        rdotx = (Odott.x * (Math.Cos(w) * Math.Cos(omega) - Math.Sin(w) * Math.Cos(i) * Math.Sin(omega)) - Odott.y * (Math.Sin(w) * Math.Cos(omega) + Math.Cos(w) * Math.Cos(i) * Math.Sin(omega)));
+        rdoty = (Odott.x * (Math.Cos(w) * Math.Sin(omega) + Math.Sin(w) * Math.Cos(i) * Math.Cos(omega)) + Odott.y * (Math.Cos(w) * Math.Cos(i) * Math.Cos(omega) - Math.Sin(w) * Math.Sin(omega)));
+        rdotz = (Odott.x * (Math.Sin(w) * Math.Sin(i)) + Odott.y * (Math.Cos(w) * Math.Sin(i)));
+
+        var Velocities = new THREE.Vector3(rdotx, rdoty, rdotz);
+        // Velocities.toArray();
+
+        return Positions;
+        return Velocities;
+
+        }
+
+
+
+    </script>
+</body>
+
+
+</html>

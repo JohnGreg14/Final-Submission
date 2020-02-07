@@ -94,8 +94,8 @@
 
                 clean();
 
-            var loader = new THREE.BufferGeometryLoader();
-			loader.load( 'Models/satelliteJSON.json', function ( geometry ) {
+                var loader = new THREE.BufferGeometryLoader();
+			    loader.load( 'Models/satelliteJSON.json', function ( geometry ) {
 
                 material = new THREE.MeshNormalMaterial();
 
@@ -105,9 +105,9 @@
         
                 
 				
-             });
+                });
 
-            }
+             }   
 
             function createInstanced( geometry) {
                 var matrix = new THREE.Matrix4;
@@ -203,8 +203,8 @@
 
 
 			// scene.rotation.x = Math.sin( time / 4 );
-            scene.rotation.y = Math.sin( time / 2 );
-            scene.rotation.y = ( time / 2 );
+            // scene.rotation.y = Math.sin( time / 2 );
+            scene.rotation.y = ( time / 6 );
             
             renderer.render( scene, camera );
         }
