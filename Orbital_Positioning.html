@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Orbital Positioning</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	
+	<style>
+		#info {
+			background-color: rgba(0,0,0,0.75);
+		}
+
+		.dg .folder .gui-stats {
+			height: auto;
+		}
+    </style>   
+</head>
+
+<body>
+	<div id="container"></div>
+
+	<script type="module">
+		import * as THREE from './js/three.module.js';
+
+		import Stats from './js/stats.module.js';
+		import { GUI } from './js/dat.gui.module.js';
+
+		import { OrbitControls } from './js/OrbitControls.module.js';
+		import { BufferGeometryUtils } from './js/BufferGeometryUtils.js';
+
+        var count = TLEInput.length;
+        
+        init();
+        converttocartesian();
+        animate();
+
+        for ( var l=0; l<count; l++ ) {
+
+
+            function converttocartesian( eraw, n, ideg, wdeg, Mdeg, t, t0, omegadeg ) {
+                
+                var mu = 3.98604419e14;
+                var e = eraw*1e-07;
+                var a = (Math.pow(mu, 1/3)) / (Math.pow((2*n*Math.PI / 86400), 2/3));
+                var M0 =  Mdeg*(Math.PI/180); //Mean anomaly at time t
+                var i = ideg*(Math.PI/180);
+                var w = wdeg*(Math.PI/180);
+                var omega = omegadeg*(Math.PI/180);
+                if (t==t0) {
+                    t=t0;
+                    Mt=M0;
+
+                    } 
+                
+                else {
+                    var deltaT = 86400*(t-t0);
+                    Mt = M0 + deltaT * Math.sqrt(mu/Math.pow(a, 3));
+                    Mt= Mt % 2*Math.PI;
+                    }
+
+                // Newton Raphson method for finding eccentric anomaly
+                var E = Mt;
+                var F = E - e * Math.sin(E) - Mt;
+                var j = 0, maxSteps = 50;
+                var stepSize = 1e-3;
+                while (Math.abs(F) > stepSize && j < maxSteps) {
+                    E = E - F / (1 - e * Math.cos(E)) % 2*Math.PI;
+                    F = E - e * Math.sin(E) - Mt;
+                    j++;
+                    return E;
+                    }
+
+                // Calculate True anomaly
+                var Vt = 2 * Math.atan2( Math.sqrt( 1 + e ) * Math.sin( E / 2 ) , Math.sqrt(1 - e ) * Math.cos( E / 2));
+
+                // Calculate distance to central body
+                var rc = a * (1 - e * Math.cos(E));
+
+                var vcoeff = Math.sqrt(mu * a ) / rc;
+
+                Ot = new THREE.Vector3(rc * Math.cos(Vt), rc * Math.sin(Vt), 0);
+                Odott = new THREE.Vector3(vcoeff * -Math.sin(E), vcoeff * Math.sqrt(1 - Math.pow(e, 2)) * Math.cos(E), 0);
+
+                var rx, ry, rz;
+                // rx = Ot.x; ry = Ot.y; rz = Ot.z;
+
+                rx = (Ot.x * (Math.cos(w) * Math.cos(omega) - Math.sin(w) * Math.cos(i) * Math.sin(omega)) - Ot.y * (Math.sin(w) * Math.cos(omega) + Math.cos(w) * Math.cos(i) * Math.sin(omega)));
+                ry = (Ot.x * (Math.cos(w) * Math.sin(omega) + Math.sin(w) * Math.cos(i) * Math.cos(omega)) + Ot.y * (Math.cos(w) * Math.cos(i) * Math.cos(omega) - Math.sin(w) * Math.sin(omega)));
+                rz = (Ot.x * (Math.sin(w) * Math.sin(i)) + Ot.y * (Math.cos(w) * Math.sin(i)));
+                
+                var Positions = new THREE.Vector3(rx, ry, rz);
+
+                var rdotx, rdoty, rdotz;
+
+
+                rdotx = (Odott.x * (Math.cos(w) * Math.cos(omega) - Math.sin(w) * Math.cos(i) * Math.sin(omega)) - Odott.y * (Math.sin(w) * Math.cos(omega) + Math.cos(w) * Math.cos(i) * Math.sin(omega)));
+                rdoty = (Odott.x * (Math.cos(w) * Math.sin(omega) + Math.sin(w) * Math.cos(i) * Math.cos(omega)) + Odott.y * (Math.cos(w) * Math.cos(i) * Math.cos(omega) - Math.sin(w) * Math.sin(omega)));
+                rdotz = (Odott.x * (Math.sin(w) * Math.sin(i)) + Odott.y * (Math.cos(w) * Math.sin(i)));
+
+                var Velocities = new THREE.Vector3(rdotx, rdoty, rdotz);
+                Velocities.toArray();
+
+                var Output = [];
+                Output = Positions.concat(Velocities);
+
+                
+
+
+                function creatematrix( rx, ry, rz ) {
+
+                    var position = new THREE.Vector3();
+                    var rotation = new THREE.Euler();
+                    var quaternion = new THREE.Quaternion();
+                    var scale = new THREE.Vector3();
+
+                    return function ( matrix ) {
+
+                        position.x = rx;
+                        position.y = ry;
+                        position.z = rz;
+
+                        rotation.x = Math.random() * 2 * Math.PI;
+                        rotation.y = Math.random() * 2 * Math.PI;
+                        rotation.z = Math.random() * 2 * Math.PI;
+
+                        quaternion.setFromEuler( rotation );
+
+                        scale.x = scale.y = scale.z = Math.random() * 0.8;
+
+                        matrix.compose( position, quaternion, scale );
+
+                        };
+
+                    };
+
+                };
+
+            var ModelRat = Math.Random() * 1;
+            var meshtype;
+
+            if ( ModelRat<0.16 ) {
+                meshtype = panel;
+
+                else if ( ModelRat<0.27 ) {
+                    meshtype = rod;
+                }
+
+                else if ( ModelRat<0.52 ) {
+                    meshtype = shard
+                }
+            else {
+                meshtype=sat;
+            }
+                }
+
+            function initMesh() {
+
+                // make instances
+                var satloader = new THREE.BufferGeometryLoader()
+                    satloader.load( 'Models/SatelliteJSON.json', function ( geometry ) {
+
+                        material = new THREE.MeshNormalMaterial();
+
+                        geometry.computeVertexNormals();
+                        
+                        makeInstanced( geometry); 
+
+
+                        } );
+
+                }
+
+            function makeInstanced( geometry ) {
+
+                var matrix = new THREE.Matrix4();
+                var mesh = new THREE.InstancedMesh( geometry, material, count );
+
+                for ( var k = 0; k < count; k ++ ) {
+
+                    creatematrix( matrix );
+                    mesh.setMatrixAt( k, matrix );
+
+                    }
+
+                scene.add( mesh );
+
+                }
+            };
+            
+
+            // 
+
+
+        function init() {
+
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+
+            // camera
+
+            camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
+            camera.position.z = 30;
+
+            // renderer
+
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( width, height );
+            renderer.outputEncoding = THREE.sRGBEncoding;
+
+            container = document.getElementById( 'container' );
+            container.appendChild( renderer.domElement );
+
+            // scene
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0xffffff );
+
+            // controls
+
+            controls = new OrbitControls( camera, renderer.domElement );
+            controls.autoRotate = true;
+
+            // stats
+
+            stats = new Stats();
+            container.appendChild( stats.dom );
+            // listeners
+
+                window.addEventListener( 'resize', onWindowResize, false );
+
+                Object.assign(window, {scene});
+                
+            }
+
+        function onWindowResize() {
+
+            var width = window.innerWidth;
+            var height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( width, height );
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame( animate );
+
+            controls.update();
+
+            render();
+
+            }
+
+        function render() {
+
+            renderer.render( scene, camera );
+
+            }
+
+</script>
+
+</body>
+</html>
+
+
