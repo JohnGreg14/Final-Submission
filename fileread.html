@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang=en>
+    <body>
+<script>
+
+var time = [];
+var inclination = [];
+var Right_Ascension = [];
+var eccentricity = [];
+var Periapsis = [];
+var Mean_Anomaly = [];
+var Daily_Motion = [];
+GetKepl();
+
+function GetKepl(){
+var allText;
+function readTextFile(file)
+{
+    var rawFile = new XMLHttpRequest();
+    rawFile.open("GET", file, false);
+    rawFile.onreadystatechange = function ()
+    {
+        if(rawFile.readyState === 4)
+        {
+            if(rawFile.status === 200 || rawFile.status == 0)
+            {
+                allText = rawFile.responseText;
+                // alert(allText);
+                // document.write(allText);
+            }
+        }
+    }
+    rawFile.send(null);
+}
+    
+readTextFile('Debris_Data.csv');
+
+
+
+var elements = [];
+
+function rowsplit(inputstring, outputarray, number){
+    
+    arrayrows = inputstring.split(/[\n,]+/);
+
+    for (var i=0; i<arrayrows.length; i++){
+    if (i%number === 0) {var arrayrow = arrayrows.slice(i, i+number,);
+   outputarray.push(arrayrow);
+    }
+    }
+}
+
+rowsplit(allText, elements, 7);
+
+
+function getCol(matrix, col){
+       var column = [];
+       for(var i=0; i<matrix.length; i++){
+          column.push(matrix[i][col]);
+       }
+       return column;
+    }
+
+count = elements.length;
+
+
+var timearray = getCol(elements, 0);
+var timestring = timearray.toString();
+rowsplit(timestring, time, 1)
+
+var inclinationarray= getCol(elements, 1);
+var inclinationstring = inclinationarray.toString();
+rowsplit(inclinationstring, inclination, 1);
+
+var Right_Ascensionarray = getCol(elements, 2);	
+var Right_Ascensionstring = Right_Ascensionarray.toString();
+rowsplit(Right_Ascensionstring, Right_Ascension, 1);
+
+var eccentricityarray = getCol(elements, 3);	
+var eccentricitystring = eccentricityarray.toString();
+rowsplit(eccentricitystring, eccentricity, 1);
+
+var Periapsisarray = getCol(elements, 4);	
+var Periapsisstring = Periapsisarray.toString();
+rowsplit(Periapsisstring, Periapsis, 1);
+
+var Mean_Anomalyarray = getCol(elements, 5);	
+var Mean_Anomalystring = Mean_Anomalyarray.toString();
+rowsplit(Mean_Anomalystring, Mean_Anomaly, 1);
+
+var Daily_Motionarray = getCol(elements, 6);	
+var Daily_Motionstring =Daily_Motionarray.toString();
+rowsplit(Daily_Motionstring, Daily_Motion, 1);
+
+}
+
+
+console.log(time);
+console.log(inclination);
+// console.log(Right_Ascension[0]);
+// console.log(eccentricity[1]/100);
+// console.log(Periapsis[0]);
+// console.log(Mean_Anomaly[0]);
+// console.log(Daily_Motion[0]);
+
+function convert(time, inclination, Right_Ascension, eccentricity, Periapsis, Mean_Anomaly, Daily_Motion) {
+for (var i=0; i<count; i++){
+    var t = time[i]
+    // console.log(t)
+    var ideg = inclination[i]
+    // console.log(ideg)
+    }
+}
+
+convert(time, inclination, Right_Ascension, eccentricity, Periapsis, Mean_Anomaly, Daily_Motion);
+
+
+
+
+
+
+</script>
+</body>
+</html>

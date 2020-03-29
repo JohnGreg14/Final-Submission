@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang=en>
+    <body>
+      <script src="js/three.js"></script>
+<script>
+
+
+for (var i = 0; i < 500; i++); {
+
+function ModelRandomise() {
+            
+   var RandomValue = Math.random() * 1;
+   console.log(RandomValue)
+   var meshtype;
+   var panel, vessel, dish, sat;
+
+   if ( RandomValue <0.16 ) {
+         meshtype = panel;
+      }
+      else if ( RandomValue<0.27 ) {
+         meshtype = vessel;
+      }
+
+      else if ( RandomValue<0.52 ) {
+         meshtype = dish;
+      }
+
+       else {
+         meshtype = sat;
+       }
+       document.write(meshtype);
+       
+   }
+
+  }
+</script>
+</body>
+</html>

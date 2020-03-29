@@ -1,0 +1,112 @@
+<html>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+        <script src="js/three.js"></script>
+        <script src="js/OrbitControls.js"></script>
+		<script>
+            var scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff)
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+           
+            var norefine = new THREE.OctahedronGeometry(10, 0 )
+            var test = norefine.faces
+            console.log(test.length)
+            var wireframe = new THREE.WireframeGeometry(norefine)
+            var line = new THREE.LineSegments(wireframe)
+            var material = new THREE.MeshPhongMaterial( {color: 0x000000} );
+            line.material = material;
+
+            var fill = new THREE.MeshBasicMaterial( { color: 0xABB2B9 } );
+            var filled = new THREE.Mesh(norefine, fill)
+           
+            // scene.add (filled)
+            scene.add(line)
+            
+            line.position.set(-45,0,0)
+            // line.rotation.set(0,5,0)
+
+            filled.position.set(-45,0,0)
+            // filled.rotation.set(0,5,0)
+
+            var norefine1 = new THREE.OctahedronGeometry(10, 1 )
+            var test1 = norefine1.faces
+            console.log(test1.length)
+            var wireframe1 = new THREE.WireframeGeometry(norefine1)
+            var line1 = new THREE.LineSegments(wireframe1) 
+            var material1 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+            line1.material = material1;
+
+            var fill1 = new THREE.MeshBasicMaterial( { color: 0xABB2B9 } );
+            var filled1 = new THREE.Mesh(norefine1, fill1)
+           
+            // scene.add (filled1)
+            scene.add(line1)
+
+            
+            line1.position.set(-15,0,0)
+            filled1.position.set(-15,0,0)
+            // line1.rotation.set(0,5,0)
+
+            var norefine2 = new THREE.OctahedronGeometry(10, 2 )
+            var test2 = norefine2.faces
+            console.log(test2.length)
+            var wireframe2 = new THREE.WireframeGeometry(norefine2)
+            var line2 = new THREE.LineSegments(wireframe2) 
+            var material2 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+            line2.material = material2;
+           
+            var fill2 = new THREE.MeshBasicMaterial( { color: 0xABB2B9 } );
+            var filled2 = new THREE.Mesh(norefine2, fill2)
+           
+            // scene.add (filled2)
+            
+            scene.add(line2)
+            
+            line2.position.set(15,0,0)
+            filled2.position.set(15,0,0)
+            // line2.rotation.set(0,5,0)
+
+            var norefine3 = new THREE.OctahedronGeometry(10, 3 )
+            var test3 = norefine3.faces
+            console.log(test3.length)
+            var wireframe3 = new THREE.WireframeGeometry(norefine3)
+            var line3 = new THREE.LineSegments(wireframe3) 
+            var material3 = new THREE.MeshBasicMaterial( {color: 0x000000} );
+            line3.material = material3;
+           
+            var fill3 = new THREE.MeshBasicMaterial( { color: 0xABB2B9 } );
+            var filled3 = new THREE.Mesh(norefine3, fill3)
+           
+            // scene.add (filled3)
+            
+            scene.add(line3)
+            
+            line3.position.set(45,0,0)
+            filled3.position.set(45,0,0)
+
+            var controls = new THREE.OrbitControls(camera, renderer.domElement)
+
+			camera.position.z = 50;
+
+			var animate = function () {
+				requestAnimationFrame( animate );
+				renderer.render( scene, camera );
+			};
+
+            animate();
+            
+            
+		</script>
+	</body>
+</html>

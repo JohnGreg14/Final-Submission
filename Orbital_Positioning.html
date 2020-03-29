@@ -28,19 +28,126 @@
 		import { OrbitControls } from './js/OrbitControls.module.js';
 		import { BufferGeometryUtils } from './js/BufferGeometryUtils.js';
 
-        var count = TLEInput.length;
-        
+        var count;
+        var time, inclination, Right_Ascension, eccentricity, Periapsis, Mean_Anomaly, Daily_Motion;
+        var camera, renderer, container, scene, controls, stats;
+        var rx, ry, rz;
+
         init();
-        converttocartesian();
+        initMesh();
         animate();
 
-        for ( var l=0; l<count; l++ ) {
+            function GetKepl(){
 
-
-            function converttocartesian( eraw, n, ideg, wdeg, Mdeg, t, t0, omegadeg ) {
+                var allText;
+                function readTextFile(file) {
+                var rawFile = new XMLHttpRequest();
+                rawFile.open("GET", file, false);
+                rawFile.onreadystatechange = function ()
+                {
+                    if(rawFile.readyState === 4)
+                    {
+                        if(rawFile.status === 200 || rawFile.status == 0)
+                        {
+                            allText = rawFile.responseText;
+                            // alert(allText);
+                            // document.write(allText);
+                        }
+                    }
+                }
+                rawFile.send(null);
+            }
                 
+            readTextFile('./TLE_Keplerian.csv');
+            var rows = allText.split(/[\n,]+/);
+
+            var elements = []
+            for (var i=0; i<rows.length; i++){
+            if (i%7 === 0) {var eletime = rows.slice(i, i+7,);
+            elements.push(eletime);
+            }
+            }
+
+            // console.log(elements);
+            function getCol(matrix, col){
+                var column = [];
+                for(var i=0; i<matrix.length; i++){
+                    column.push(matrix[i][col]);
+                }
+                return column;
+                }
+
+            count = elements.length;
+
+            time = getCol(elements, 0);
+			inclination= getCol(elements, 1);
+			Right_Ascension = getCol(elements, 2);
+			eccentricity = getCol(elements, 3);
+			Periapsis= getCol(elements, 4);
+			Mean_Anomaly = getCol(elements, 5);
+			Daily_Motion = getCol(elements, 6);
+
+            };
+
+            // 
+
+
+            function init() {
+                
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
+                // camera
+
+                camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
+                camera.position.z = 30;
+
+                // renderer
+
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( width, height );
+                renderer.outputEncoding = THREE.sRGBEncoding;
+
+                container = document.getElementById( 'container' );
+                container.appendChild( renderer.domElement );
+
+                // scene
+
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color( 0xffffff );
+
+                // controls
+
+                controls = new OrbitControls( camera, renderer.domElement );
+                controls.autoRotate = true;
+
+                // stats
+
+                stats = new Stats();
+                container.appendChild( stats.dom );
+                // listeners
+
+                    window.addEventListener( 'resize', onWindowResize, false );
+
+                    Object.assign(window, {scene});
+
+                
+                for (var i = 0; i < count; i++) {    
+
+                function converttocartesian(time, inclination, Right_Ascension, eccentricity, Periapsis, Mean_Anomaly, Daily_Motion) {
+
+                var t = time[i];
+				var ideg = inclination[i];
+				var omegadeg = Right_Ascension[i];
+			    var e = eccentricity[i]/1e7;
+				var wdeg = Periapsis[i];
+				var Mdeg = Mean_Anomaly[i];
+				var n = Daily_Motion[i];
+                
+                t0 = 0;
+            
                 var mu = 3.98604419e14;
-                var e = eraw*1e-07;
                 var a = (Math.pow(mu, 1/3)) / (Math.pow((2*n*Math.PI / 86400), 2/3));
                 var M0 =  Mdeg*(Math.PI/180); //Mean anomaly at time t
                 var i = ideg*(Math.PI/180);
@@ -81,32 +188,21 @@
                 Ot = new THREE.Vector3(rc * Math.cos(Vt), rc * Math.sin(Vt), 0);
                 Odott = new THREE.Vector3(vcoeff * -Math.sin(E), vcoeff * Math.sqrt(1 - Math.pow(e, 2)) * Math.cos(E), 0);
 
-                var rx, ry, rz;
                 // rx = Ot.x; ry = Ot.y; rz = Ot.z;
 
                 rx = (Ot.x * (Math.cos(w) * Math.cos(omega) - Math.sin(w) * Math.cos(i) * Math.sin(omega)) - Ot.y * (Math.sin(w) * Math.cos(omega) + Math.cos(w) * Math.cos(i) * Math.sin(omega)));
                 ry = (Ot.x * (Math.cos(w) * Math.sin(omega) + Math.sin(w) * Math.cos(i) * Math.cos(omega)) + Ot.y * (Math.cos(w) * Math.cos(i) * Math.cos(omega) - Math.sin(w) * Math.sin(omega)));
                 rz = (Ot.x * (Math.sin(w) * Math.sin(i)) + Ot.y * (Math.cos(w) * Math.sin(i)));
                 
-                var Positions = new THREE.Vector3(rx, ry, rz);
-
-                var rdotx, rdoty, rdotz;
-
 
                 rdotx = (Odott.x * (Math.cos(w) * Math.cos(omega) - Math.sin(w) * Math.cos(i) * Math.sin(omega)) - Odott.y * (Math.sin(w) * Math.cos(omega) + Math.cos(w) * Math.cos(i) * Math.sin(omega)));
                 rdoty = (Odott.x * (Math.cos(w) * Math.sin(omega) + Math.sin(w) * Math.cos(i) * Math.cos(omega)) + Odott.y * (Math.cos(w) * Math.cos(i) * Math.cos(omega) - Math.sin(w) * Math.sin(omega)));
                 rdotz = (Odott.x * (Math.sin(w) * Math.sin(i)) + Odott.y * (Math.cos(w) * Math.sin(i)));
 
-                var Velocities = new THREE.Vector3(rdotx, rdoty, rdotz);
-                Velocities.toArray();
-
-                var Output = [];
-                Output = Positions.concat(Velocities);
-
-                
+                }
 
 
-                function creatematrix( rx, ry, rz ) {
+                function creatematrix() {
 
                     var position = new THREE.Vector3();
                     var rotation = new THREE.Euler();
@@ -129,141 +225,78 @@
 
                         matrix.compose( position, quaternion, scale );
 
-                        };
+                        }
 
-                    };
+                    }
 
-                };
-
-            var ModelRat = Math.Random() * 1;
-            var meshtype;
-
-            if ( ModelRat<0.16 ) {
-                meshtype = panel;
-
-                else if ( ModelRat<0.27 ) {
-                    meshtype = rod;
                 }
-
-                else if ( ModelRat<0.52 ) {
-                    meshtype = shard
-                }
-            else {
-                meshtype=sat;
             }
-                }
 
-            function initMesh() {
+       function initMesh() {
 
-                // make instances
-                var satloader = new THREE.BufferGeometryLoader()
-                    satloader.load( 'Models/SatelliteJSON.json', function ( geometry ) {
+		
 
-                        material = new THREE.MeshNormalMaterial();
+			// make instances
+			new THREE.BufferGeometryLoader()
+				.load( 'Models/SatelliteJSON.json', function ( geometry ) {
 
-                        geometry.computeVertexNormals();
-                        
-                        makeInstanced( geometry); 
+					material = new THREE.MeshNormalMaterial();
+
+                    geometry.computeVertexNormals();
+                    
+                    makeInstanced( geometry); 
 
 
-                        } );
+			} );
 
-                }
+		}
 
             function makeInstanced( geometry ) {
 
                 var matrix = new THREE.Matrix4();
                 var mesh = new THREE.InstancedMesh( geometry, material, count );
 
-                for ( var k = 0; k < count; k ++ ) {
+                for ( var i = 0; i < count; i ++ ) {
 
                     creatematrix( matrix );
-                    mesh.setMatrixAt( k, matrix );
+                    mesh.setMatrixAt( i, matrix );
 
                     }
 
                 scene.add( mesh );
 
                 }
-            };
             
 
-            // 
+            function onWindowResize() {
 
+                var width = window.innerWidth;
+                var height = window.innerHeight;
 
-        function init() {
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
 
-            var width = window.innerWidth;
-            var height = window.innerHeight;
-
-            // camera
-
-            camera = new THREE.PerspectiveCamera( 70, width / height, 1, 100 );
-            camera.position.z = 30;
-
-            // renderer
-
-            renderer = new THREE.WebGLRenderer( { antialias: true } );
-            renderer.setPixelRatio( window.devicePixelRatio );
-            renderer.setSize( width, height );
-            renderer.outputEncoding = THREE.sRGBEncoding;
-
-            container = document.getElementById( 'container' );
-            container.appendChild( renderer.domElement );
-
-            // scene
-
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color( 0xffffff );
-
-            // controls
-
-            controls = new OrbitControls( camera, renderer.domElement );
-            controls.autoRotate = true;
-
-            // stats
-
-            stats = new Stats();
-            container.appendChild( stats.dom );
-            // listeners
-
-                window.addEventListener( 'resize', onWindowResize, false );
-
-                Object.assign(window, {scene});
-                
-            }
-
-        function onWindowResize() {
-
-            var width = window.innerWidth;
-            var height = window.innerHeight;
-
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-
-            renderer.setSize( width, height );
-
-        }
-
-        function animate() {
-
-            requestAnimationFrame( animate );
-
-            controls.update();
-
-            render();
+                renderer.setSize( width, height );
 
             }
 
-        function render() {
+            function animate() {
 
-            renderer.render( scene, camera );
+                requestAnimationFrame( animate );
 
-            }
+                controls.update();
+
+                render();
+
+                }
+
+            function render() {
+
+                renderer.render( scene, camera );
+
+                }
 
 </script>
 
 </body>
 </html>
-
-

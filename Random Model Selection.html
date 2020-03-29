@@ -1,0 +1,61 @@
+function initMesh() {
+
+    var RandomValue = Math.random()*1;
+    var loader = new THREE.BufferGeometryLoader();
+
+    if ( RandomValue <0.16 ) {
+        loader.load( 'Models/PanelJSON.json', function ( geometry ) {
+
+            material = new THREE.MeshNormalMaterial();
+
+            geometry.computeVertexNormals();
+            
+            makeInstanced( geometry ); 
+
+
+            } );
+
+        }
+
+    else if ( RandomValue<0.27 ) {
+        loader.load( 'Models/vessel.json', function ( geometry ) {
+
+        material = new THREE.MeshNormalMaterial();
+
+        geometry.computeVertexNormals();
+
+        makeInstanced( geometry ); 
+
+
+            } );
+
+        }      
+
+    else if ( RandomValue<0.52 ) {
+        loader.load( 'Models/Dish.json', function ( geometry ) {
+
+        material = new THREE.MeshNormalMaterial();
+
+        geometry.computeVertexNormals();
+
+        makeInstanced( geometry ); 
+
+
+            } );
+
+        }  
+
+    else {
+        loader.load( 'Models/SatelliteJSON.json', function ( geometry ) {
+
+        material = new THREE.MeshNormalMaterial();
+
+        geometry.computeVertexNormals();
+
+        makeInstanced( geometry ); 
+
+
+            } );
+
+        }  
+    };

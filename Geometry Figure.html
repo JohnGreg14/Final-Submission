@@ -1,0 +1,119 @@
+<html>
+	<head>
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+        <script src="js/three.js"></script>
+        <script src="js/OrbitControls.js"></script>
+		<script>
+            var scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xffffff)
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var cubegeometry = new THREE.BoxGeometry();
+			var cubematerial = new THREE.MeshBasicMaterial( { color: 0x1565c0 } );
+			var cube = new THREE.Mesh( cubegeometry, cubematerial );
+            scene.add( cube );
+
+          
+            var outlineMaterial1 = new THREE.MeshBasicMaterial( { color: 0x80000, side: THREE.BackSide } );
+            var outlineMesh1 = new THREE.Mesh( cubegeometry, outlineMaterial1 );
+            outlineMesh1.position = cube.position;
+            outlineMesh1.scale.multiplyScalar(1.05);
+            scene.add( outlineMesh1 );
+
+        
+            cube.position.set(-4,0,0)
+            outlineMesh1.position.set(-4,0,0)
+
+            var Spheregeometry = new THREE.SphereGeometry(0.5,32,32);
+			var Spherematerial = new THREE.MeshBasicMaterial( { color: 0x1565c0} );
+			var sphere= new THREE.Mesh( Spheregeometry, Spherematerial );
+            scene.add( sphere );
+            
+            
+            var outlineMaterial2 = new THREE.MeshBasicMaterial( { color: 0x80000, side: THREE.BackSide } );
+            var outlineMesh2 = new THREE.Mesh( Spheregeometry, outlineMaterial1 );
+            outlineMesh2.position = sphere.position;
+            outlineMesh2.scale.multiplyScalar(1.05);
+            scene.add( outlineMesh2 );
+            sphere.position.set(-2,0,0)
+            outlineMesh2.position.set(-2,0,0)
+
+
+            
+            var Icosahedrongeometry = new THREE.IcosahedronGeometry();
+			var Icosahedronmaterial = new THREE.MeshBasicMaterial( { color: 0x1565c0} );
+			var Icosahedron= new THREE.Mesh( Icosahedrongeometry, Icosahedronmaterial );
+            scene.add( Icosahedron );
+            
+            
+            var outlineMaterial3 = new THREE.MeshBasicMaterial( { color: 0x80000, side: THREE.BackSide } );
+            var outlineMesh3 = new THREE.Mesh( Icosahedrongeometry, outlineMaterial1 );
+            outlineMesh3.position = Icosahedron.position;
+            outlineMesh3.scale.multiplyScalar(1.05);
+            scene.add( outlineMesh3 );
+
+            Icosahedron.position.set(0,0,0)
+            outlineMesh3.position.set(0,0,0)
+
+            
+            var TorusKnotgeometry = new THREE.TorusKnotGeometry(0.5, 0.1)
+			var TorusKnotmaterial = new THREE.MeshBasicMaterial( { color: 0x1565c0} );
+			var TorusKnot= new THREE.Mesh( TorusKnotgeometry, TorusKnotmaterial );
+            scene.add( TorusKnot );
+            
+            
+            var outlineMaterial4 = new THREE.MeshBasicMaterial( { color: 0x80000, side: THREE.BackSide } );
+            var outlineMesh4 = new THREE.Mesh( TorusKnotgeometry, outlineMaterial1 );
+            outlineMesh4.position = TorusKnot.position;
+            outlineMesh4.scale.multiplyScalar(1.05);
+            scene.add( outlineMesh4 );
+
+            TorusKnot.position.set(2,0,0)
+            outlineMesh4.position.set(2,0,0)
+
+            
+            var Conegeometry = new THREE.ConeGeometry(0.25,1);
+			var Conematerial = new THREE.MeshBasicMaterial( { color: 0x1565c0} );
+			var Cone= new THREE.Mesh( Conegeometry, Conematerial );
+            scene.add( Cone );
+            
+            
+            var outlineMaterial5 = new THREE.MeshBasicMaterial( { color: 0x80000, side: THREE.BackSide } );
+            var outlineMesh5 = new THREE.Mesh( Conegeometry, outlineMaterial1 );
+            outlineMesh5.position = Cone.position;
+            outlineMesh5.scale.multiplyScalar(1.05);
+            scene.add( outlineMesh5 );
+
+            Cone.position.set(4,0,0)
+            outlineMesh5.position.set(4,0,0)
+
+			camera.position.z = 5;
+
+            var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            var triangle= new THREE.Geometry();
+            triangle.vertices.push( new THREE.Vector3( -50, -50, 0 ));
+            triangle.vertices.push(new THREE.Vector3(  50, -50, 0 ));
+            triangle.vertices.push(new THREE.Vector3(  50,  50, 0 ));
+            console.log(triangle)
+
+			var animate = function () {
+				requestAnimationFrame( animate );
+
+				renderer.render( scene, camera );
+			};
+
+			animate();
+		</script>
+	</body>
+</html>
